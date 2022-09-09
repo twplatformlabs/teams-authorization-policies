@@ -61,5 +61,5 @@ jobs:
             fi
       - run:
           name: Configure system
-          command: ./configure-system << parameters.environment >>
+          command: ./configure-system.sh << parameters.environment >>
 
