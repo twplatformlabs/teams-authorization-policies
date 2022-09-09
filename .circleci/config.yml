@@ -51,6 +51,7 @@ jobs:
       - image: docker.io/twdps/circleci-base-image:alpine-stable
     shell: << pipeline.parameters.shell-options >>
     steps:
+      - checkout
       - run:
           name: Ensure API Token is set
           command: |
