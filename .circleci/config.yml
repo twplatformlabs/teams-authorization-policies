@@ -66,4 +66,8 @@ jobs:
       - run:
           name: Configure system
           command: ./configure-system.sh << parameters.environment >> << parameters.branch >>
-
+      - run:
+          name: Sync Branch
+          command: |
+            git branch -f << parameters.branch >> $CIRCLE_SHA1
+            git push https://$GITHUB_ACCESS_TOKEN@github.com/ThoughtWorks-DPS/teams-authorization-policies.git << parameters.branch >>
