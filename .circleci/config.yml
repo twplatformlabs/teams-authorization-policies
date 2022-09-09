@@ -1,0 +1,64 @@
+---
+version: 2.1
+
+orbs:
+  python: twdps/python-api@0.1.0
+  cosign: twdps/cosign@0.1.0
+  kube: twdps/kube-ops@0.3.0
+
+# ==== global pipeline parameters
+
+parameters:
+  context:
+    description: circleci context for all jobs
+    type: string
+    default: twdps-core-labs-team
+  shell-options:
+    description: shell options for all jobs
+    type: string
+    default: op run --env-file op.env -- /bin/bash -eo pipefail
+
+on-push-main: &on-push-main
+  branches:
+    only: /main/
+  tags:
+    ignore: /.*/
+
+on-tag-main: &on-tag-main
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
+
+workflows:
+  version: 2
+
+  development:
+    jobs:
+      - create-system:
+          name: Create Development Styra System
+          context: << pipeline.parameters.context >>
+          environment: dev
+          filters: *on-push-main
+
+jobs:
+  create-system:
+    parameters:
+      environment:
+        type: string
+        description: Environment to configure
+    docker:
+      - image: docker.io/twdps/circleci-base-image:alpine-stable
+    shell: << pipeline.parameters.shell-options >>
+    steps:
+      - run:
+          name: Ensure API Token is set
+          command: |
+            if [ ! ${STYRA_API_TOKEN} ]; then
+              echo "Styra token is not being set"
+              exit 1
+            fi
+      - run:
+          name: Configure system
+          command: ./configure-system << parameters.environment >>
+
