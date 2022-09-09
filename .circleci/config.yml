@@ -39,6 +39,7 @@ workflows:
           name: Create Development Styra System
           context: << pipeline.parameters.context >>
           environment: dev
+          branch: dev
           filters: *on-push-main
 
 jobs:
@@ -47,6 +48,9 @@ jobs:
       environment:
         type: string
         description: Environment to configure
+      branch:
+        type: string
+        description: branch to track policies on
     docker:
       - image: docker.io/twdps/circleci-base-image:alpine-stable
     shell: << pipeline.parameters.shell-options >>
@@ -61,5 +65,5 @@ jobs:
             fi
       - run:
           name: Configure system
-          command: ./configure-system.sh << parameters.environment >>
+          command: ./configure-system.sh << parameters.environment >> << parameters.branch >>
 
