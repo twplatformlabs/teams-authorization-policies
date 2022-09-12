@@ -2,7 +2,7 @@
 version: 2.1
 
 orbs:
-  op: twdps/onepassword@1.0.0
+  op: twdps/onepassword@dev:latest
 
 # ==== global pipeline parameters
 
@@ -56,6 +56,7 @@ jobs:
       - checkout
       - op/install-op:
           os: Alpine
+          shell: /bin/bash -eo pipefail
       - run:
           name: Ensure API Token is set
           command: |
