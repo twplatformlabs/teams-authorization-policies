@@ -95,6 +95,7 @@ jobs:
         description: Environment to configure
     docker:
       - image: docker.io/twdps/circleci-python-builder:stable
+    shell: << pipeline.parameters.shell-options >>
     steps:
       - checkout
       - op/install-op:
