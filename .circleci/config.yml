@@ -94,21 +94,23 @@ jobs:
         type: string
         description: Environment to configure
     docker:
-      - image: twdps/circleci-kube-ops:alpine-0.7.0
+      - image: docker.io/twdps/circleci-python-builder:stable
     steps:
       - checkout
       - op/install-op:
           os: Alpine
           shell: /bin/bash -eo pipefail
       - run:
-          name: Setup python
-          command: |
-            pip install --user pipenv
-            pipenv install
-      - run:
           name: Generate namespace config
           command: |
+            pipenv install
             pipenv run configure_k8s_namespace.py << parameters.environment >>
+      - run:
+          name: Install kubectl
+          command: |
+            curl -SLO "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl"
+            sudo chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
       - run:
           name: Setup OPA in Namespace
           command: |
