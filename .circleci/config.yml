@@ -2,9 +2,7 @@
 version: 2.1
 
 orbs:
-  python: twdps/python-api@0.1.0
-  cosign: twdps/cosign@0.1.0
-  kube: twdps/kube-ops@0.3.0
+  op: twdps/onepassword@1.0.0
 
 # ==== global pipeline parameters
 
@@ -56,6 +54,8 @@ jobs:
     shell: << pipeline.parameters.shell-options >>
     steps:
       - checkout
+      - op/install-op:
+          os: Alpine
       - run:
           name: Ensure API Token is set
           command: |
