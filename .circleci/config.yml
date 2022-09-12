@@ -40,6 +40,27 @@ workflows:
           branch: dev
           filters: *on-push-main
 
+  qa:
+    jobs:
+      - create-system:
+          name: Create/Update QA Styra System
+          context: << pipeline.parameters.context >>
+          environment: qa
+          branch: qa
+          filters: *on-tag-main
+      - approve-prod:
+          name: Approve Deployment to Production
+          type: approval
+          requires:
+            - Create/Update QA Styra System
+      - create-system:
+          name: Create/Update Production System
+          context: << pipeline.parameters.context >>
+          environment: prod
+          branch: prod
+          requires:
+            - Approve Deployment to Production
+
 jobs:
   create-system:
     parameters:
@@ -65,12 +86,12 @@ jobs:
               exit 1
             fi
       - run:
-          name: Configure system
-          command: |
-            pipenv install
-            pipenv run python configure_system.py << parameters.environment >> << parameters.branch >>
-      - run:
           name: Sync Branch
           command: |
             git branch -f << parameters.branch >> $CIRCLE_SHA1
             git push https://$GITHUB_ACCESS_TOKEN@github.com/ThoughtWorks-DPS/teams-authorization-policies.git << parameters.branch >>
+      - run:
+          name: Configure system
+          command: |
+            pipenv install
+            pipenv run python configure_system.py << parameters.environment >> << parameters.branch >>
