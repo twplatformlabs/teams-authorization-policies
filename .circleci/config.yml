@@ -2,7 +2,7 @@
 version: 2.1
 
 orbs:
-  op: twdps/onepassword@dev:latest
+  op: twdps/onepassword@1.1.0
 
 # ==== global pipeline parameters
 
@@ -68,7 +68,7 @@ jobs:
           name: Configure system
           command: |
             pipenv install
-            pipenv run python ./configure-system.py << parameters.environment >> << parameters.branch >>
+            pipenv run python configure_system.py << parameters.environment >> << parameters.branch >>
       - run:
           name: Sync Branch
           command: |
