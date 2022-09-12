@@ -57,6 +57,7 @@ workflows:
           type: approval
           requires:
             - Create/Update QA Styra System
+          filters: *on-tag-main
       - create-system:
           name: Create/Update Production System
           context: << pipeline.parameters.context >>
@@ -64,6 +65,7 @@ workflows:
           branch: prod
           requires:
             - Approve Deployment to Production
+          filters: *on-tag-main
 
 jobs:
   test-rego:
