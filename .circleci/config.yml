@@ -101,6 +101,11 @@ jobs:
           os: Alpine
           shell: /bin/bash -eo pipefail
       - run:
+          name: Setup python
+          command: |
+            pip install --user pipenv
+            pipenv install
+      - run:
           name: Generate namespace config
           command: |
             pipenv run configure_k8s_namespace.py << parameters.environment >>
