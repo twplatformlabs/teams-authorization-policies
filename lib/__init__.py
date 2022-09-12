@@ -49,6 +49,26 @@ class StyraClient:
         else:
             print("Successfully created secret for git credentials")
 
+    def get_envoy_filter(self, system_name: str):
+        request = requests.get(self.prefix + f"systems/{system_name}/assets/envoyfilter.yaml",
+                timeout=5, headers=self.headers)
+        request.raise_for_status()
+        return request.text
+
+
+    def get_opa_config(self, system_name: str):
+        request = requests.get(self.prefix + f"systems/{system_name}/assets/opaconfig.yaml",
+                timeout=5, headers=self.headers)
+        request.raise_for_status()
+        return request.text
+
+
+    def get_slp_deployment(self, system_name: str):
+        request = requests.get(self.prefix + f"systems/{system_name}/assets/slp.yaml",
+                timeout=5, headers=self.headers)
+        request.raise_for_status()
+        return request.text
+
 
     def _create_system(self, name: str,  branch: str):
         headers = self.headers.copy()

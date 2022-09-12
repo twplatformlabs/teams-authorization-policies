@@ -37,20 +37,33 @@ workflows:
           name: Test and Lint policies
           filters: *on-push-main
       - create-system:
-          name: Create Development Styra System
+          name: Create/Update Development Styra System
           context: << pipeline.parameters.context >>
           environment: dev
           branch: dev
           requires:
             - Test and Lint policies
+      - deploy-slp:
+          name: Deploy SLP to dev
+          context: << pipeline.parameters.context >>
+          environment: dev
+          requires:
+            - Create/Update Development Styra System
 
-  qa:
+  release:
     jobs:
       - create-system:
           name: Create/Update QA Styra System
           context: << pipeline.parameters.context >>
           environment: qa
           branch: qa
+          filters: *on-tag-main
+      - deploy-slp:
+          name: Deploy SLP to qa
+          context: << pipeline.parameters.context >>
+          environment: qa
+          requires:
+            - Create/Update QA Styra System
           filters: *on-tag-main
       - approve-prod:
           name: Approve Deployment to Production
@@ -59,15 +72,45 @@ workflows:
             - Create/Update QA Styra System
           filters: *on-tag-main
       - create-system:
-          name: Create/Update Production System
+          name: Create/Update Production Styra System
           context: << pipeline.parameters.context >>
           environment: prod
           branch: prod
           requires:
             - Approve Deployment to Production
           filters: *on-tag-main
+      - deploy-slp:
+          name: Deploy SLP to prod
+          context: << pipeline.parameters.context >>
+          environment: prod
+          requires:
+            - Create/Update Production Styra System
+          filters: *on-tag-main
 
 jobs:
+  deploy-slp:
+    parameters:
+      environment:
+        type: string
+        description: Environment to configure
+    docker:
+      - image: twdps/circleci-kube-ops:alpine-0.7.0
+    steps:
+      - checkout
+      - op/install-op:
+          os: Alpine
+          shell: /bin/bash -eo pipefail
+      - run:
+          name: Generate namespace config
+          command: |
+            pipenv run configure_k8s_namespace.py << parameters.environment >>
+      - run:
+          name: Setup OPA in Namespace
+          command: |
+            kubectl apply -f envoyfilter.yaml --namespace twdps-core-labs-team-<< parameters.environment >>
+            kubectl apply -f opaconfig.yaml --namespace twdps-core-labs-team-<< parameters.environment >>
+            kubectl apply -f slp.yaml --namespace twdps-core-labs-team-<< parameters.environment >>
+
   test-rego:
     docker:
       - image: docker.io/twdps/circleci-base-image:alpine-stable

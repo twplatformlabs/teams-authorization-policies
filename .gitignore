@@ -1,2 +1,5 @@
 body.json
 secret.json
+envoyfilter.yaml
+opaconfig.yaml
+slp.yaml
