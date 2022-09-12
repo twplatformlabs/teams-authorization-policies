@@ -104,7 +104,7 @@ jobs:
           name: Generate namespace config
           command: |
             pipenv install
-            pipenv run configure_k8s_namespace.py << parameters.environment >>
+            pipenv run python configure_k8s_namespace.py << parameters.environment >>
       - run:
           name: Install kubectl
           command: |
