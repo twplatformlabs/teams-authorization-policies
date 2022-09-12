@@ -52,7 +52,7 @@ jobs:
         type: string
         description: branch to track policies on
     docker:
-      - image: docker.io/twdps/circleci-base-image:alpine-stable
+      - image: docker.io/twdps/circleci-python-builder:stable
     shell: << pipeline.parameters.shell-options >>
     steps:
       - checkout
@@ -65,7 +65,9 @@ jobs:
             fi
       - run:
           name: Configure system
-          command: ./configure-system.sh << parameters.environment >> << parameters.branch >>
+          command: |
+            pipenv install
+            pipenv run python ./configure-system.py << parameters.environment >> << parameters.branch >>
       - run:
           name: Sync Branch
           command: |
