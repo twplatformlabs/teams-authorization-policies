@@ -78,7 +78,7 @@ jobs:
             chmod 755 ./opa
             sudo mv ./opa /usr/local/bin/opa
             opa version
-      - run: opa --diff --fail policy/
+      - run: opa fmt --diff --fail policy/
       - run: opa check policy/
       - run: opa test -v policy/
   create-system:
