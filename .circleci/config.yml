@@ -47,6 +47,7 @@ workflows:
           name: Deploy SLP to dev
           context: << pipeline.parameters.context >>
           environment: dev
+          cluster: prod-us-east-1
           requires:
             - Create/Update Development Styra System
 
@@ -62,6 +63,7 @@ workflows:
           name: Deploy SLP to qa
           context: << pipeline.parameters.context >>
           environment: qa
+          cluster: prod-us-east-1
           requires:
             - Create/Update QA Styra System
           filters: *on-tag-main
@@ -83,6 +85,7 @@ workflows:
           name: Deploy SLP to prod
           context: << pipeline.parameters.context >>
           environment: prod
+          cluster: prod-us-east-1
           requires:
             - Create/Update Production Styra System
           filters: *on-tag-main
@@ -93,6 +96,9 @@ jobs:
       environment:
         type: string
         description: Environment to configure
+      cluster:
+        type: string
+        description: cluster to deploy to
     docker:
       - image: docker.io/twdps/circleci-python-builder:stable
     shell: << pipeline.parameters.shell-options >>
@@ -112,6 +118,11 @@ jobs:
             curl -SLO "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl"
             sudo chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
+      - run:
+          name: pull kubeconfig
+          command: |
+            mkdir -p ~/.kube
+            ENV=<< parameters.cluster >> op inject -i kubeconfig.tpl -o ~/.kube/config
       - run:
           name: Setup OPA in Namespace
           command: |
